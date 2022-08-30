@@ -4,23 +4,7 @@ library(readxl)
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
-source('./R/Functions.R')  ## load functions
-
-files <- list.files(path = ('./data/'), full.names = TRUE)
-
-## test the function
-ch1 <- read_exl('./data/002.xlsx')
-
-
-#bind all data frames of FIRST data frame ofread_exl() together
-answers_together <- data.frame()
-all_data_together <- list()
-
-for (file in files) {
-  tmp_exl <- read_exl(file)
-  answers_together <- bind_rows(answers_together, tmp_exl[[1]])
-}
-row.names(answers_together) <- files
+source('./R/0_ReadData.R')
 
 
 ## vik: general comment ot Johannes. We should check the data for presence of NAs prior to plotting. There should be NAs in such 
