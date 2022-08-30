@@ -21,7 +21,8 @@ read_exl <- function(filename) {
   colnames(dat2_trs) <- dat2$Q_ID
   dat2_trs_cl <- dat2_trs %>% 
     filter(row_number() %in% 2) %>% 
-    mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = 'a/')[[1]][2])
+    mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][4],
+           coder = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][3])
   
   ##replacing manually added NA values from df to real NAs
   dat2_trs_cl[dat2_trs_cl == "na"] <- NA
