@@ -23,6 +23,12 @@ for (file in files) {
 row.names(answers_together) <- files
 
 
+## vik: general comment ot Johannes. We should check the data for presence of NAs prior to plotting. There should be NAs in such 
+# questions as Q0. So, if there is NA it measn ppl did not code the paper properly. And then we should check it with the coders
+
+sum(is.na(answers_together$Q0))
+is.na(answers_together$Q0)
+answers_together$PaperID[is.na(answers_together$Q0)]
 
 ## 2. plots
 
