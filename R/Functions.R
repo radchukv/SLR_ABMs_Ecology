@@ -28,5 +28,15 @@ read_exl <- function(filename) {
   dat2_trs_cl[dat2_trs_cl == "n/a"] <- NA
   dat2_trs_cl[dat2_trs_cl == "N/A"] <- NA
   
+  ## set explicit answer for Q3 
+  if(is.na(dat2_trs_cl$Q3)){
+    for (i in 5:9) {
+      if(is.na(dat2_trs_cl[i])) {next}
+      if(dat2_trs_cl[i] == "Yes") {
+        dat2_trs_cl$Q3 = colnames(dat2_trs_cl)[i]
+      }
+    }
+  }
+  
   return(list(dat2_trs_cl, dat1))
 }
