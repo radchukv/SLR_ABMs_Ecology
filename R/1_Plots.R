@@ -10,6 +10,8 @@ source('./R/0_ReadData.R')
 ## vik: general comment ot Johannes. We should check the data for presence of NAs prior to plotting. There should be NAs in such 
 # questions as Q0. So, if there is NA it measn ppl did not code the paper properly. And then we should check it with the coders
 
+## Jo: is this necessary for each Question? And if yes, do I need to report this in someway (e.g. a variable containing all na's?)
+
 sum(is.na(answers_together$Q0))
 is.na(answers_together$Q0)
 answers_together$PaperID[is.na(answers_together$Q0)]
@@ -17,14 +19,21 @@ answers_together$PaperID[is.na(answers_together$Q0)]
 ## 2. plots
 
 #Q0
+#barplot
 ggplot() +
   geom_bar(data = answers_together, aes(Q0))
+#simple table with proportions
+Q0_table <- table(answers_together$Q0)
+Q0_table <- cbind(Q0_table,prop.table(Q0_table))
 
+##Question formulation phase
 #Q1
 ggplot() +
   geom_bar(data = answers_together, aes(Q1)) +
   scale_x_discrete(labels = c("No", "Not as questions, \nbut explicit aim or objective", "Yes", "NA"))
 
+##RQ1.2
+##sampling phase
 #Q3
 ggplot() +
   geom_bar(data = answers_together, aes(Q3))
@@ -96,3 +105,47 @@ ggplot() +
 #Q32
 answers_together$Q32 <- as.numeric(answers_together$Q32)
 summary(answers_together$Q32)
+
+
+## Analysis phase
+#Q36 Alluvial plot
+
+##RQ3.1
+#Q2
+#barplot
+ggplot() +
+  geom_bar(data = answers_together, aes(Q2)) +
+  scale_y_continuous(limits=c(0,10), breaks = c(0,2,4,6,8,10)) #needs to be adapted to final counts!
+
+#simple table with proportions
+Q2_table <- table(answers_together$Q2)
+Q2_table <- cbind(Q2_table,prop.table(Q2_table))
+
+#Q33.7
+ggplot() +
+  geom_bar(data = answers_together, aes(Q33.7)) +
+  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16)) #needs to be adapted to final counts!
+
+##RQ3.1
+#Q33
+Q33_sum <- c()
+names_Q33 <- c("Q33.1", "Q33.2", "Q33.3", "Q33.4", "Q33.5", "Q33.6", "Q33.7", "Q33.8")
+for (i in 51:57) {
+  Q33_sum <- append(Q33_sum, sum((answers_together[i] == "Yes"), na.rm = T))
+}
+Q33_sum <- append(Q33_sum, sum((answers_together$Q33.8 != "No"), na.rm = T))
+names(Q33_sum) <- names_Q33
+
+barplot(Q33_sum)
+
+#Q34
+Q34_sum <- c()
+names_Q34 <- c("Q34.1", "Q34.2", "Q34.3", "Q34.4")
+for (i in 60:62) {
+  Q34_sum <- append(Q34_sum, sum((answers_together[i] == "Yes"), na.rm = T))
+}
+Q34_sum <- append(Q34_sum, sum((answers_together$Q34.4 != "No"), na.rm = T))
+names(Q34_sum) <- names_Q34
+
+barplot(Q34_sum)
+
