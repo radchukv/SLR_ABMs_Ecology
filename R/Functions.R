@@ -23,5 +23,10 @@ read_exl <- function(filename) {
     filter(row_number() %in% 2) %>% 
     mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = 'a/')[[1]][2])
   
+  ##replacing manually added NA values from df to real NAs
+  dat2_trs_cl[dat2_trs_cl == "na"] <- NA
+  dat2_trs_cl[dat2_trs_cl == "n/a"] <- NA
+  dat2_trs_cl[dat2_trs_cl == "N/A"] <- NA
+  
   return(list(dat2_trs_cl, dat1))
 }
