@@ -271,7 +271,7 @@ for (i in 1:length(answers_together$Q36)) {
   }
 }
 
-#actual alluvial plot
+#actual alluvial plot: full version
 ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q3, 
                                     axis3 = practise_Q4, axis4 = practise_Q11, 
                                     axis5 = practise_Q14, axis6 = practise_Q21, 
@@ -288,12 +288,31 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q3,
   ylab("count") +
   guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
 
+# shorter version
+ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q4, 
+                                    axis3 = practise_Q11, axis4 = practise_Q14, 
+                                    axis5 = practise_Q27, axis8 = Q36,
+                                    fill = practise_Q1)) +
+  geom_alluvium(width = 0) +
+  geom_stratum(width = 1/3, fill = "white", color = "grey") +
+  scale_x_discrete(limits = c("Q1", "Q4", "Q11", "Q14", "Q27", "Q36"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
+  ylab("count") +
+  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
+
+
 ##RQ3.1
 #Q2
 #barplot
 ggplot() +
   geom_bar(data = answers_together, aes(Q2)) +
-  scale_y_continuous(limits=c(0,10), breaks = c(0,2,4,6,8,10)) #needs to be adapted to final counts!
+  scale_y_continuous(limits=c(0,10), breaks = c(0,2,4,6,8,10)) + #needs to be adapted to final counts!
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 #simple table with proportions
 Q2_table <- table(answers_together$Q2)
@@ -302,7 +321,10 @@ Q2_table <- cbind(Q2_table,prop.table(Q2_table))
 #Q33.7
 ggplot() +
   geom_bar(data = answers_together, aes(Q33.7)) +
-  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16)) #needs to be adapted to final counts!
+  scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16)) + #needs to be adapted to final counts!
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
 
 ##RQ3.1
 #Q33
