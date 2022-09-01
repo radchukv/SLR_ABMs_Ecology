@@ -1,6 +1,7 @@
 ## calculating the inter-rater reliability, using Cohen's Kappa
 library(readxl)
 library(dplyr)
+library(stringr)
 library(irr)
 source('./R/Functions.R')
 
@@ -43,3 +44,19 @@ kappa2(bind_cols(answers_Seb$Q3, answers_Mel$Q3))
 ## this metric is only possible to calculate for cases with mutually-exclusive categories
 ## OR: one would really go for each subquestion (liek Q3.1, Q3.2 etc)
 kappa2(bind_cols(answers_Seb$Q3.1, answers_Mel$Q3.1))
+
+
+#### kappa for all questions in one df
+int_rel_per_quest <- data.frame()
+for (i in 1:(length(answers_Mel)-2)) {
+  if(str_detect(colnames(answers_Mel)[i+1], "\\.1")){
+    next
+  }
+  tmp_kappa <- kappa2(bind_cols(answers_Seb[i], answers_Mel[i]))$value
+  if(tmp_kappa == "NaN" && (nrow(unique(answers_Mel[i])) == 1 && nrow(unique(answers_Seb[i])) == 1)) {
+    tmp_kappa = 1
+  }
+  int_rel_per_quest <- rbind(int_rel_per_quest, c(tmp_kappa, colnames(answers_Mel)[i]))
+}
+colnames(int_rel_per_quest)[1] <- "kappa"
+colnames(int_rel_per_quest)[2] <- "Question"
