@@ -64,3 +64,29 @@ for (i in 1:(length(answers_Mel)-2)) {
 }
 colnames(int_rel_per_quest)[1] <- "kappa"
 colnames(int_rel_per_quest)[2] <- "Question"
+
+
+#### kappa with levels from codebook, not actual data (work in progress)
+
+# retrieve levels from codebook
+
+kappa2(bind_cols(factor(answers_Seb$Q34.3, levels = c("Yes", "No")), factor(answers_Mel$Q34.3, levels = c("Yes", "No"))))
+
+library(vcd)
+library(caret)
+
+
+fact_Q0_seb <- factor(answers_Seb$Q0, levels = c("Yes", "No"))
+fact_Q0_mel <- factor(answers_Mel$Q0, levels = c("Yes", "No"))
+
+test <- confusionMatrix(factor(answers_Seb$Q11.1, levels = c("Yes", "No", NA)), factor(answers_Mel$Q11.1, levels = c("Yes", "No", NA)))
+
+## calculate P_e
+
+sum <- 0
+for (i in 1:2) {
+  sum = sum #+ ()
+}
+
+(5*3+11*13)*(1/16^2)
+(16*16+0*0)*(1/16)
