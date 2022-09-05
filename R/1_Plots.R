@@ -321,7 +321,10 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q3,
   theme_bw() +
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
   ylab("count") +
-  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
+  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?")) +
+  annotate("label", x = 1.08, y = 17, label = "Question\nformulation", size = 2.5)  +
+  annotate("label", x = 4.5, y = 17, label = "Sampling phase", size = 4)  +
+  annotate("label", x = 8, y = 17, label = "Analysis\nphase", size = 2.5)
 
 ggsave("./plots/alluvial_big.pdf")
 
@@ -339,7 +342,10 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q4,
   theme_bw() +
   theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
   ylab("count") +
-  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
+  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?")) +
+  annotate("label", x = 1.1, y = 17, label = "Question\nformulation", size = 3)  +
+  annotate("label", x = 3, y = 17, label = "Sampling phase", size = 4)  +
+  annotate("label", x = 4.97, y = 17, label = "Analysis\nphase", size = 3)
 
 ggsave("./plots/alluvial_small.pdf")
 
