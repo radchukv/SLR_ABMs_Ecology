@@ -69,6 +69,23 @@ colnames(int_rel_per_quest)[1] <- "kappa"
 colnames(int_rel_per_quest)[2] <- "Question"
 
 
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q10'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q11.5'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q24'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q25'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q32'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q39'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q40'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q41'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q42'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q43'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q44'] <- NA
+
+int_rel_per_quest$kappa <- as.numeric(int_rel_per_quest$kappa)
+hist(int_rel_per_quest$kappa, main ='', xlab = 'kappa')
+abline(v = median(int_rel_per_quest$kappa, na.rm = T), col = 'blue', lwd = 2)
+
+write.csv(int_rel_per_quest, file = './output/Cohenkappa_calc.csv')
 #### kappa with levels from codebook, not actual data (work in progress)
 
 # retrieve levels from codebook
