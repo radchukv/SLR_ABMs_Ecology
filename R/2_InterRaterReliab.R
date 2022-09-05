@@ -21,11 +21,14 @@ row.names(answers_Seb) <- files_seb
 ## read in the data coded by the second coder
 files_mel <- list.files(path = ('./data/Mel'), full.names = TRUE)
 
+ch1 <- read_exl(files_mel[2])
+test <- read_exl('./data/Mel/132.xlsx')
 #bind all data frames of FIRST data frame of read_exl() together
 answers_Mel <- data.frame()
 
 for (file in files_mel) {
   tmp_exl <- read_exl(file)
+ # print(file)
   answers_Mel <- bind_rows(answers_Mel, tmp_exl[[1]])
 }
 row.names(answers_Mel) <- files_mel
