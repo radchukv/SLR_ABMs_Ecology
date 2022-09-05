@@ -82,10 +82,13 @@ int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q43'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q44'] <- NA
 
 int_rel_per_quest$kappa <- as.numeric(int_rel_per_quest$kappa)
+pdf('./plots/hist_CohensKappa.pdf')
 hist(int_rel_per_quest$kappa, main ='', xlab = 'kappa')
 abline(v = median(int_rel_per_quest$kappa, na.rm = T), col = 'blue', lwd = 2)
+dev.off()
 
 write.csv(int_rel_per_quest, file = './output/Cohenkappa_calc.csv')
+quantile(int_rel_per_quest$kappa, probs = c(0.05, 0.1, 0.25, 0.7, 0.8), na.rm = T)
 #### kappa with levels from codebook, not actual data (work in progress)
 
 # retrieve levels from codebook
