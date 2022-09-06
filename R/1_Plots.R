@@ -5,6 +5,7 @@ library(dplyr)
 library(ggplot2)
 library(ggalluvial)
 library(gridExtra)
+library(scales)
 source('./R/0_ReadData.R')
 
 
@@ -29,12 +30,10 @@ edge_rec <- 0.5
 #barplot
 #max(sum(answers_together$Q0 == "Yes"), sum(answers_together$Q0 == "No"))
 y_max <- max(table(answers_together$Q0))
-  
-ggplot() +
-  geom_bar(data = answers_together, aes(Q0)) +
-  geom_rect(aes(xmin = 1.5, xmax = 2.5,
-                ymin = -edge_rec, ymax = y_max+  edge_rec), 
-            col = color_chosen, alpha = 0) +
+ggplot(data = answers_together, aes(x = Q0)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -48,12 +47,14 @@ Q0_table <- cbind(Q0_table,prop.table(Q0_table))
 ##Question formulation phase
 #Q1
 y_max <- max(table(answers_together$Q1))
-ggplot() +
-  geom_bar(data = answers_together, aes(Q1)) +
+ggplot(data = answers_together, aes(x = Q1)) +
+  geom_bar() +
   geom_rect(aes(xmin = 1.5, xmax = 3.5,
                 ymin = -edge_rec, ymax = y_max+edge_rec), 
             col = color_chosen, alpha = 0) +
   scale_x_discrete(labels = c("No", "Not as questions, \nbut explicit aim or objective", "Yes", "NA")) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -78,27 +79,31 @@ for (i in 1:length(answers_together$Q3)) {
 }
 answers_together$Q3 <- factor(answers_together$Q3, levels = c("Combined", "Journal-Driven", "(public) Database-Driven", "Seminal-Work-Driven", "Others", "Approach unclear"))
 
-ggplot() +
-  geom_bar(data = answers_together, aes(Q3)) +
+ggplot(data = answers_together, aes(x = Q3)) +
+  geom_bar() +
   geom_rect(aes(xmin = 0.5, xmax = x_max,
                 ymin = -edge_rec, ymax = y_max + edge_rec), 
             col = color_chosen, alpha = 0) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), 
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust = 1))
 
 ggsave("./plots/Q3.pdf")
 
 #Q4
 #max(sum(answers_together$Q4 == "Yes"),sum(answers_together$Q4 == "No keyword search applied"))
 y_max <- max(table(answers_together$Q4))
-ggplot() +
-  geom_bar(data = answers_together, aes(Q4)) +
+ggplot(data = answers_together, aes(x = Q4)) +
+  geom_bar() +
   scale_x_discrete(labels = c("No", "Not keyword \nsearch applied", "Yes")) +
   geom_rect(aes(xmin = 1.5, xmax = 3.5,
-                ymin = -edge_rec, ymax = y_max + edge_rec), 
+                ymin = -edge_rec, ymax = y_max + edge_rec +0.5), 
             col = color_chosen, alpha = 0) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -129,20 +134,24 @@ ggplot(data = data.frame(Q11_sum),aes(seq_along(Q11_sum),Q11_sum)) +
   geom_rect(aes(xmin = 1.5, xmax = 5.5,
                 ymin = -edge_rec, ymax = y_max + edge_rec), 
             col = color_chosen, alpha = 0) +
+  geom_text(aes(label = Q11_sum), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q11.pdf")
 
 #Q14
 y_max <- max(table(answers_together$Q14))
-ggplot() +
-  geom_bar(data = answers_together, aes(Q14)) +
+ggplot(data = answers_together, aes(x = Q14)) +
+  geom_bar() +
   geom_rect(aes(xmin = 1.5, xmax = 2.5,
                 ymin = -edge_rec, ymax = y_max + edge_rec), 
             col = color_chosen, alpha = 0) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -150,18 +159,48 @@ ggplot() +
 ggsave("./plots/Q14.pdf")
 
 #Q15-Q20 for supplement
-pQ15 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q15))
-pQ16 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q16))
-pQ17 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q17))
-pQ18 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q18))
-pQ19 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q19))
-pQ20 <- ggplot() +
-  geom_bar(data = answers_together, aes(Q20))
+pQ15 <- ggplot(data = answers_together, aes(x = Q15)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+pQ16 <- ggplot(data = answers_together, aes(x = Q16)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+pQ17 <- ggplot(data = answers_together, aes(x = Q17)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+pQ18 <- ggplot(data = answers_together, aes(x = Q18)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+pQ19 <- ggplot(data = answers_together, aes(x = Q19)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
+pQ20 <- ggplot(data = answers_together, aes(x = Q20)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(limits = c(0,max(table(answers_together$Q20))+3), breaks = pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) 
 
 p <- arrangeGrob(pQ15, pQ16, pQ17, pQ18, pQ19, pQ20)
 
@@ -169,11 +208,13 @@ ggsave("./plots/Q15-Q20.pdf", p)
 
 #Q21
 y_max <- max(table(answers_together$Q21))
-ggplot() +
-  geom_bar(data = answers_together, aes(Q21)) +
+ggplot(data = answers_together, aes(x = Q21)) +
+  geom_bar() +
   geom_rect(aes(xmin = 1.5, xmax = 2.5,
                 ymin = -0.5, ymax = y_max + 0.5), 
             col = color_chosen, alpha = 0) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -181,8 +222,10 @@ ggplot() +
 ggsave("./plots/Q21.pdf")
 
 #Q22 for supplement
-ggplot() +
-  geom_bar(data = answers_together, aes(Q22)) +
+ggplot(data = answers_together, aes(x = Q22)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -212,20 +255,24 @@ ggplot(data = data.frame(Q27_sum),aes(seq_along(Q27_sum),Q27_sum)) +
   geom_rect(aes(xmin = 0.5, xmax = 5.5,
                 ymin = -edge_rec, ymax = y_max + edge_rec), 
             col = color_chosen, alpha = 0) +
+  geom_text(aes(label = Q27_sum), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q27.pdf")
 
 #Q30
 y_max <- max(table(answers_together$Q30))
-ggplot() +
-  geom_bar(data = answers_together, aes(Q30)) +
+ggplot(data = answers_together, aes(x = Q30)) +
+  geom_bar() +
   geom_rect(aes(xmin = 1.5, xmax = 2.5,
                 ymin = -edge_rec, ymax = y_max + edge_rec), 
             col = color_chosen, alpha = 0) +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) 
@@ -241,21 +288,34 @@ summary(answers_together$Q32)
 #Q36
 Q36_sum <- c()
 #names_Q11 <- c("Q11.1", "Q11.2", "Q11.3", "Q11.4", "Q11.5")
-names_Q36 <- c("Bibliometric\nanalysis", "Scientific\nmapping", "Meta-analysis", "Structured\ncomparison", "Unstructured\ncomparison", "Others")
 
 for (i in 66:71) {
   Q36_sum <- append(Q36_sum, sum((answers_together[i] == "Yes"), na.rm = T))
 }
+
+names_Q36 <- c("Bibliometric\nanalysis", "Scientific\nmapping", "Meta-analysis", "Structured\ncomparison", "Others", "Unstructured\ncomparison")
 names(Q36_sum) <- names_Q36
+
+# exchange order of unstructured comparison and others for plotting good practise box
+tmp <- Q36_sum[6]
+Q36_sum[6] <- Q36_sum[5]
+Q36_sum[5] <- tmp
+
+y_max <- max(Q36_sum)
 
 ggplot(data = data.frame(Q36_sum),aes(seq_along(Q36_sum),Q36_sum)) +
   geom_bar(stat = "identity") +
+  geom_rect(aes(xmin = 0.5, xmax = 5.5,
+                ymin = -edge_rec, ymax = y_max + edge_rec), 
+            col = color_chosen, alpha = 0) +
+  geom_text(aes(label = Q36_sum), vjust=-0.5) +
   scale_x_continuous(name = "Q36", breaks = c(1,2,3,4,5,6), labels = names_Q36) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   ylab("count") +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q36.pdf")
 
@@ -292,6 +352,10 @@ answers_together$practise_Q27[which(answers_together$Q27.5 == "Yes")] <- "No"
 answers_together$practise_Q30 <- NA
 answers_together$practise_Q30[which(answers_together$Q30 != "No")] <- "Yes"
 answers_together$practise_Q30[which(answers_together$Q30 == "No")] <- "No"
+#Q36
+answers_together$practise_Q36 <- NA
+answers_together$practise_Q36[which(answers_together$Q36.5 != "Yes")] <- "Yes"
+answers_together$practise_Q36[which(answers_together$Q36.5 == "Yes")] <- "No"
 
 #Q36?
 ## set explicit answer for Q36 (assumed, that it's mutual exclusive)
@@ -314,7 +378,7 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q3,
                                     #axis9 = Q36,
                                     fill = practise_Q1)) +
   geom_alluvium(width = 0) +
-  geom_stratum(width = 1/3, fill = "white", color = "grey") +
+  geom_stratum(width = 1/5, fill = "white", color = "grey") +
   scale_x_discrete(limits = c("Q1", "Q3", "Q4", "Q11", "Q14", "Q21", "Q27", "Q30"), expand = c(.05, .05)) +
   scale_fill_brewer(type = "qual", palette = "Set1") +
   geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
@@ -335,7 +399,7 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q4,
                                     #axis8 = Q36,
                                     fill = practise_Q1)) +
   geom_alluvium(width = 0) +
-  geom_stratum(width = 1/3, fill = "white", color = "grey") +
+  geom_stratum(width = 1/5, fill = "white", color = "grey") +
   scale_x_discrete(limits = c("Q1", "Q4", "Q11", "Q14", "Q27"), expand = c(.05, .05)) +
   scale_fill_brewer(type = "qual", palette = "Set1") +
   geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
@@ -349,12 +413,41 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q4,
 
 ggsave("./plots/alluvial_small.pdf")
 
+# Sebastian version
+answers_together$practise_phase_2 <- NA
+# add good practise for phase 2: sampling phase
+for (j in 1:length(answers_together$Q0)) {
+  for (i in 83:89) {
+    if(answers_together[j,i] == "No") {
+      answers_together$practise_phase_2[j] = "No"
+      break
+    }
+  }
+}
+answers_together$practise_phase_2[is.na(answers_together$practise_phase_2)] <- "Yes"
+
+ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_phase_2, 
+                                    axis3 = practise_Q36,
+                                    fill = practise_Q1)) +
+  geom_alluvium(width = 0) +
+  geom_stratum(width = 1/6, fill = "white", color = "grey") +
+  scale_x_discrete(limits = c("Question\nformulation", "Sampling phase", "Analysis\nphase"), expand = c(.05, .05)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
+  ylab("count") +
+  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
+
+ggsave("./plots/alluvial_seb.pdf")
+
 ##RQ3.1
 #Q2
 #barplot
-ggplot() +
-  geom_bar(data = answers_together, aes(Q2)) +
-  #scale_y_continuous(limits=c(0,10), breaks = c(0,2,4,6,8,10)) + #needs to be adapted to final counts!
+ggplot(data = answers_together, aes(x = Q2)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
@@ -366,9 +459,10 @@ Q2_table <- table(answers_together$Q2)
 Q2_table <- cbind(Q2_table,prop.table(Q2_table))
 
 #Q33.7
-ggplot() +
-  geom_bar(data = answers_together, aes(Q33.7)) +
-  #scale_y_continuous(breaks = c(2,4,6,8,10,12,14,16)) + #needs to be adapted to final counts!
+ggplot(data = answers_together, aes(x = Q33.7)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank())
@@ -391,12 +485,14 @@ names(Q33_sum) <- names_Q33
 
 ggplot(data = data.frame(Q33_sum),aes(seq_along(Q33_sum),Q33_sum)) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(name = "Q27", breaks = c(1,2,3,4,5,6,7,8), labels = names_Q33) +
+  geom_text(aes(label = Q33_sum), vjust=-0.5) +
+  scale_x_continuous(name = "Q33", breaks = c(1,2,3,4,5,6,7,8), labels = names_Q33) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   ylab("count") +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q33.pdf")
 
@@ -412,12 +508,14 @@ names(Q34_sum) <- names_Q34
 
 ggplot(data = data.frame(Q34_sum),aes(seq_along(Q34_sum),Q34_sum)) +
   geom_bar(stat = "identity") +
-  scale_x_continuous(name = "Q27", breaks = c(1,2,3,4), labels = names_Q34) +
+  geom_text(aes(label = Q34_sum), vjust=-0.5) +
+  scale_x_continuous(name = "Q34", breaks = c(1,2,3,4), labels = names_Q34) +
+  scale_y_continuous(breaks= pretty_breaks()) +
   ylab("count") +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+        axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q34.pdf")
 
