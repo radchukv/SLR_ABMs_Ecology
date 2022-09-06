@@ -58,7 +58,7 @@ for (i in 1:(length(answers_Mel)-2)) {
   tmp_kappa <- kappa2(bind_cols(answers_Seb[i], answers_Mel[i]))$value
   if(tmp_kappa == "NaN") { #problem with calculation, if only one variable expression exists
     if((nrow(unique(answers_Mel[i])) == 1 && nrow(unique(answers_Seb[i])) == 1) ||
-       (nrow(unique(answers_Mel[i])) == 2 && sum(is.na(unique(answers_Mel[i]))) == 1) ||
+       (nrow(unique(answers_Mel[i])) == 2 && sum(is.na(unique(answers_Seb[i]))) == 1) ||
        (nrow(unique(answers_Seb[i])) == 2 && sum(is.na(unique(answers_Mel[i]))) == 1)) {
     tmp_kappa = 1
     }
