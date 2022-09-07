@@ -3,8 +3,15 @@
 ## 1. Function to read the Excel sheets
 
 read_exl <- function(filename) {
-  dat <- read_xlsx(path = filename,  sheet = "Coding_tool", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
-                   col_names = c('Q_ID', 'Drop1', 'Drop2', 'Question', 'Drop3', 'AnswerType', 'Explan', 'Source', 'Drop4', 'Answer', 'Comments'))
+  if(grep('Aligned', filename)){
+    dat <- read_xlsx(path = filename,  sheet = "Coding_agreement", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
+                     col_names = c('Q_ID', 'Drop1', 'Drop2', 'Question', 'Drop3', 'AnswerType', 'Explan', 'Source', 'Drop4', 'Answer', 'Comments'))
+  }
+  else{
+    dat <- read_xlsx(path = filename,  sheet = "Coding_tool", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
+                     col_names = c('Q_ID', 'Drop1', 'Drop2', 'Question', 'Drop3', 'AnswerType', 'Explan', 'Source', 'Drop4', 'Answer', 'Comments'))
+    
+  }
   
   ## one dataset with all relevant info
   dat1 <- dat %>% 
