@@ -21,8 +21,7 @@ row.names(answers_Seb) <- files_seb
 ## read in the data coded by the second coder
 files_mel <- list.files(path = ('./data/Mel'), full.names = TRUE)
 
-ch1 <- read_exl(files_mel[2])
-test <- read_exl('./data/Mel/132.xlsx')
+ch1 <- read_exl("./data/Mel/132.xlsx")
 #bind all data frames of FIRST data frame of read_exl() together
 answers_Mel <- data.frame()
 
@@ -74,6 +73,9 @@ int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q11.5'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q24'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q25'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q32'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q34.4'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q36.6'] <- NA
+int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q37'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q39'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q40'] <- NA
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q41'] <- NA
