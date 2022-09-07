@@ -4,10 +4,10 @@ library(readxl)
 library(dplyr)
 source('./R/Functions.R')  ## load functions
 
-files <- list.files(path = ('./data/Seb'), full.names = TRUE)
+files <- list.files(path = ('./data/Aligned'), full.names = TRUE)
 
 ## test the function
-ch1 <- read_exl('./data/Seb/002.xlsx')
+ch1 <- read_exl('./data/Aligned/002.xlsx')
 
 
 #bind all data frames of FIRST data frame ofread_exl() together
