@@ -12,7 +12,6 @@ ch1 <- read_exl('./data/Aligned/002.xlsx')
 
 #bind all data frames of FIRST data frame ofread_exl() together
 answers_together <- data.frame()
-all_data_together <- list()
 
 for (file in files) {
   tmp_exl <- read_exl(file)

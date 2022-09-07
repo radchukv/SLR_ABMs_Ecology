@@ -9,10 +9,7 @@ library(scales)
 source('./R/0_ReadData.R')
 
 
-## vik: general comment ot Johannes. We should check the data for presence of NAs prior to plotting. There should be NAs in such 
-# questions as Q0. So, if there is NA it measn ppl did not code the paper properly. And then we should check it with the coders
-
-## Jo: is this necessary for each Question? And if yes, do I need to report this in someway (e.g. a variable containing all na's?)
+## we excude the 123 paper because it was not coded, the coders decided it does not belong to the sample actually
 
 sum(is.na(answers_together$Q0))
 is.na(answers_together$Q0)
@@ -435,11 +432,12 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_phase_
   scale_fill_brewer(type = "qual", palette = "Set1") +
   geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
   theme_bw() +
-  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
+        legend.position = 'bottom') +
   ylab("count") +
-  guides(fill=guide_legend(title="Is a research question\nexplicitly formulated?"))
+  guides(fill=guide_legend(title="Does the paper comply with the 'good practice?'"))
 
-ggsave("./plots/alluvial_seb.pdf")
+ggsave("./plots/alluvial_finSeb.pdf")
 
 ##RQ3.1
 #Q2
