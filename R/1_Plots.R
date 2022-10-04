@@ -9,7 +9,7 @@ library(scales)
 source('./R/0_ReadData.R')
 
 
-## we excude the 123 paper because it was not coded, the coders decided it does not belong to the sample actually
+## we exclude the 123 paper because it was not coded, the coders decided it does not belong to the sample actually
 
 sum(is.na(answers_together$Q0))
 is.na(answers_together$Q0)
