@@ -3,7 +3,7 @@
 ## 1. Function to read the Excel sheets
 
 read_exl <- function(filename) {
-  if(grep('Aligned', filename)){
+  if(grepl('Aligned', filename)){
     dat <- read_xlsx(path = filename,  sheet = "Coding_agreement", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
                      col_names = c('Q_ID', 'Drop1', 'Drop2', 'Question', 'Drop3', 'AnswerType', 'Explan', 'Source', 'Drop4', 'Answer', 'Comments'))
   }
