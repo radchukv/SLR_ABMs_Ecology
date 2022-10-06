@@ -53,7 +53,7 @@ read_exl <- function(filename) {
       }
     }
     
-    output_list <- append(output_list, list(dat2_trs_cl))
+    output_list <- append(list(dat2_trs_cl), output_list)
     
   }
   

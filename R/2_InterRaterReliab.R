@@ -6,66 +6,72 @@ library(irr)
 source('./R/Functions.R')
 
 ## read in the data coded by the first coder
-files_seb <- list.files(path = ('./data/Seb'), full.names = TRUE)
+files <- list.files(path = ('./data/Comparison_IRR'), full.names = TRUE)
 
 #bind all data frames of FIRST data frame of read_exl() together
-answers_Seb <- data.frame()
+answers_CoderA <- data.frame()
+answers_CoderB <- data.frame()
 
-for (file in files_seb) {
+for (file in files) {
   tmp_exl <- read_exl(file)
-  answers_Seb <- bind_rows(answers_Seb, tmp_exl[[1]])
+  answers_CoderA <- bind_rows(answers_CoderA, tmp_exl[[1]])
+  answers_CoderB <- bind_rows(answers_CoderB, tmp_exl[[2]])
 }
-row.names(answers_Seb) <- files_seb
+row.names(answers_CoderA) <- files
+row.names(answers_CoderB) <- files
 
-
-## read in the data coded by the second coder
-files_mel <- list.files(path = ('./data/Mel'), full.names = TRUE)
-
-ch1 <- read_exl("./data/Mel/132.xlsx")
-#bind all data frames of FIRST data frame of read_exl() together
-answers_Mel <- data.frame()
-
-for (file in files_mel) {
-  tmp_exl <- read_exl(file)
- # print(file)
-  answers_Mel <- bind_rows(answers_Mel, tmp_exl[[1]])
-}
-row.names(answers_Mel) <- files_mel
 
 ## for now it seems like 123 study was not entered, so dropping it here (later on check with the coders)
-answers_Mel <- answers_Mel[!is.na(answers_Mel$Q0), ]
-answers_Seb <- answers_Seb[!is.na(answers_Seb$Q0), ]
+answers_CoderA <- answers_CoderA[!is.na(answers_CoderA$Q0), ]
+answers_CoderB <- answers_CoderB[!is.na(answers_CoderB$Q0), ]
 
-
-Q0 <- bind_cols(answers_Seb$Q0, answers_Mel$Q0)
+'''
+##### Start: testing calculations for kappa and raw agreement
+'''
+Q0 <- bind_cols(answers_CoderA$Q0, answers_CoderB$Q0)
 kappa2(Q0, weight = 'unweighted')
 
-kappa2(bind_cols(answers_Seb$Q1, answers_Mel$Q1))
-kappa2(bind_cols(answers_Seb$Q2, answers_Mel$Q2))
-kappa2(bind_cols(answers_Seb$Q3, answers_Mel$Q3))
+kappa2(bind_cols(answers_CoderA$Q1, answers_CoderB$Q1))
+kappa2(bind_cols(answers_CoderA$Q2, answers_CoderB$Q2))
+kappa2(bind_cols(answers_CoderA$Q3, answers_CoderB$Q3))
 ## this metric is only possible to calculate for cases with mutually-exclusive categories
-## OR: one would really go for each subquestion (liek Q3.1, Q3.2 etc)
-kappa2(bind_cols(answers_Seb$Q3.1, answers_Mel$Q3.1))
+## OR: one would really go for each sub-question (like Q3.1, Q3.2 etc)
+kappa2(bind_cols(answers_CoderA$Q3.1, answers_CoderB$Q3.1))
 
+tmp_raw_agree 
+## tmp_raw_agree <- as.data.frame(cbind(anwers_CoderA,ifelse(answers_CoderA$Q0==anwer_CoderB$Q0, 1, 0)))
+tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(answers_CoderA)
+
+
+'''
+##### End: testing calculations for kappa and raw agreement
+'''
 
 #### kappa for all questions in one df
 int_rel_per_quest <- data.frame()
-for (i in 1:(length(answers_Mel)-2)) {
-  if(str_detect(colnames(answers_Mel)[i+1], "\\.1")){
+
+for (i in 1:(length(answers_CoderB)-2)) {
+  if(str_detect(colnames(answers_CoderB)[i+1], "\\.1")){
     next
   }
-  tmp_kappa <- kappa2(bind_cols(answers_Seb[i], answers_Mel[i]))$value
+  tmp_kappa <- kappa2(bind_cols(answers_CoderA[i], answers_CoderB[i]))$value
   if(tmp_kappa == "NaN") { #problem with calculation, if only one variable expression exists
-    if((nrow(unique(answers_Mel[i])) == 1 && nrow(unique(answers_Seb[i])) == 1) ||
-       (nrow(unique(answers_Mel[i])) == 2 && sum(is.na(unique(answers_Seb[i]))) == 1) ||
-       (nrow(unique(answers_Seb[i])) == 2 && sum(is.na(unique(answers_Mel[i]))) == 1)) {
+    if((nrow(unique(answers_CoderB[i])) == 1 && nrow(unique(answers_CoderA[i])) == 1) ||
+       (nrow(unique(answers_CoderB[i])) == 2 && sum(is.na(unique(answers_CoderA[i]))) == 1) ||
+       (nrow(unique(answers_CoderA[i])) == 2 && sum(is.na(unique(answers_CoderB[i]))) == 1)) {
     tmp_kappa = 1
+    
     }
   }
-  int_rel_per_quest <- rbind(int_rel_per_quest, c(tmp_kappa, colnames(answers_Mel)[i]))
+  
+  tmp_raw_agree <- sum(ifelse(answers_CoderA[i]==answers_CoderB[i], 1, 0))/nrow(answers_CoderA)
+  
+  int_rel_per_quest <- rbind(int_rel_per_quest, c(colnames(answers_CoderB)[i], tmp_kappa, tmp_raw_agree))
 }
-colnames(int_rel_per_quest)[1] <- "kappa"
-colnames(int_rel_per_quest)[2] <- "Question"
+
+colnames(int_rel_per_quest)[1] <- "Question"
+colnames(int_rel_per_quest)[2] <- "kappa"
+colnames(int_rel_per_quest)[3] <- "raw agreement"
 
 
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q10'] <- NA
@@ -95,16 +101,16 @@ quantile(int_rel_per_quest$kappa, probs = c(0.05, 0.1, 0.25, 0.7, 0.8), na.rm = 
 
 # retrieve levels from codebook
 
-kappa2(bind_cols(factor(answers_Seb$Q34.3, levels = c("Yes", "No")), factor(answers_Mel$Q34.3, levels = c("Yes", "No"))))
+kappa2(bind_cols(factor(answers_CoderA$Q34.3, levels = c("Yes", "No")), factor(answers_CoderB$Q34.3, levels = c("Yes", "No"))))
 
 library(vcd)
 library(caret)
 
 
-fact_Q0_seb <- factor(answers_Seb$Q0, levels = c("Yes", "No"))
-fact_Q0_mel <- factor(answers_Mel$Q0, levels = c("Yes", "No"))
+fact_Q0_seb <- factor(answers_CoderA$Q0, levels = c("Yes", "No"))
+fact_Q0_mel <- factor(answers_CoderB$Q0, levels = c("Yes", "No"))
 
-test <- confusionMatrix(factor(answers_Seb$Q11.1, levels = c("Yes", "No", NA)), factor(answers_Mel$Q11.1, levels = c("Yes", "No", NA)))
+test <- confusionMatrix(factor(answers_CoderA$Q11.1, levels = c("Yes", "No", NA)), factor(answers_CoderB$Q11.1, levels = c("Yes", "No", NA)))
 
 ## calculate P_e
 
