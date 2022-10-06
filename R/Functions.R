@@ -28,7 +28,7 @@ read_exl <- function(filename) {
     
     ## second dataset only with the data on answers + Q number
     dat2 <- dat %>% 
-      select(Q_ID, coder) %>%               ## keep the columns we do need - column Q_ID and coder from for-loop
+      select(Q_ID, all_of(coder)) %>%               ## keep the columns we do need - column Q_ID and coder from for-loop
       filter(!row_number() %in% c(2, 5, 6, 13, 17, 30, 31, 45, 46, 56, 60, 86)) 
     
     dat2_trs <- as.data.frame(t(dat2))
@@ -36,7 +36,7 @@ read_exl <- function(filename) {
     dat2_trs_cl <- dat2_trs %>% 
       filter(row_number() %in% 2) %>% 
       mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][4],
-             coder = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][3])
+             coder = strsplit(coder, split = '_')[[1]][2])
     
     ##replacing manually added NA values from df to real NAs
     dat2_trs_cl[dat2_trs_cl == "na"] <- NA
