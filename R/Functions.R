@@ -60,3 +60,25 @@ read_exl <- function(filename) {
   return(output_list)
   
 }
+
+
+## 2. Function to save the results in tabular format
+
+save_table <- function(Col_Q, data,
+                       fold_path){
+Q_table <- table(data[, Col_Q])
+Q_table <- cbind(Q_table,prop.table(Q_table))
+table <- t(Q_table)
+table_basename <- './output/Quest1'
+wb <- openxlsx::createWorkbook("My name here")
+openxlsx::addWorksheet(wb, 'Sheet 1', gridLines = FALSE)
+openxlsx::writeData(wb, sheet = 1, table)
+hs <- openxlsx::createStyle(border = "TopBottom",
+                            textDecoration = "Bold",
+                            halign = "center")
+openxlsx::addStyle(wb, sheet = 1, hs, rows = 1, cols= 1:ncol(table))
+
+openxlsx::saveWorkbook(wb, paste0(fold_path, Col_Q, ".xlsx"), overwrite = TRUE)
+print(paste("The table has been created and is saved at location:",
+            normalizePath(paste0(fold_path, Col_Q, ".xlsx"))))
+}
