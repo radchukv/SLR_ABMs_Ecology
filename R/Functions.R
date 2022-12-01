@@ -2,6 +2,16 @@
 
 ## 1. Function to read the Excel sheets
 
+#  1. Function checks whether (1) in folder with "aligned" files or (2) in folder with "comparison" files
+#  2. For (1), num_coder = 1 that for-loop runs only one iteration to read the aligned coding 
+#      --> output are two dataframes nested in a list: raw data and cleaned aligned coding 
+#      --> Used for analysis with plots and tables 
+#  3. For (2), num_coder = 2 that for-loop runs two iterations to read the coding of both coders 
+#      --> output are three dataframes nested in a list: raw data and cleaned coding for both coder 
+#      --> Used for IRR calculation
+
+
+
 read_exl <- function(filename) {
   if(grepl('Aligned', filename)){
     dat <- read_xlsx(path = filename,  sheet = "Coding_agreement", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
@@ -35,7 +45,7 @@ read_exl <- function(filename) {
     colnames(dat2_trs) <- dat2$Q_ID
     dat2_trs_cl <- dat2_trs %>% 
       filter(row_number() %in% 2) %>% 
-      mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][4],
+      mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][5],
              coder = strsplit(coder, split = '_')[[1]][2])
     
     ##replacing manually added NA values from df to real NAs

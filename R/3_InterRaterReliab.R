@@ -6,7 +6,7 @@ library(irr)
 source('./R/Functions.R')
 
 ## read in the data coded by the first coder
-files <- list.files(path = ('./data/Comparison_IRR'), full.names = TRUE)
+files <- list.files(path = ('./data/ecology/Comparison_IRR'), full.names = TRUE)
 
 #bind all data frames of FIRST data frame of read_exl() together
 answers_CoderA <- data.frame()
