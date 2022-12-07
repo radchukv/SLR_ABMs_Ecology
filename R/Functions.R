@@ -99,14 +99,17 @@ print(paste("The table has been created and is saved at location:",
 
 count_question_result <- function(Q_ID, data, codebook_details) {
   
+  
+  
   Q = Q_ID
   
   # Count results to be stored in df_results
   result_question = as.data.frame(data %>% group_by(category) %>% count(data[Q]))
   
   # Create data frame in right format to store count-results and afterwards use for flextable-layout
-  category_row <- rep(c("ecology", "social"), each = nrow(unique(result_question[Q]))) %>% append(NA, after=0)
-  answer_row <- rep(t(unique(result_question[Q])), times=2) %>% append(NA, after=0)
+  
+  answer_row <- rep(strsplit(filter(codebook_details, Q_ID == Q)[1,3] %>% pull(AnswerType), split = "/")[[1]], times=2) %>% append(NA, after=0)
+  category_row <- rep(c("ecology", "social"), each = length(unique(answer_row))-1) %>% append(NA, after=0)
   question <- filter(codebook_details, Q_ID == Q)[1,2] %>% pull(Question)
   question_row <- rep(NA, times = length(answer_row)-1) %>% append(question, after=0)
   df_result <- as.data.frame(rbind(category_row,answer_row,question_row))

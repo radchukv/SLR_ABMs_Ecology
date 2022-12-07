@@ -2,6 +2,7 @@
 
 library(readxl)
 library(dplyr)
+library(flextable)
 source('./R/Functions.R')  ## load functions
 
 files_ecology <- list.files(path = ('./data/ecology/Aligned'), full.names = TRUE)
@@ -34,9 +35,11 @@ answers_social$category <- rep(c("social"),times=nrow(answers_social))
 # combine ecology and social dataframe together
 answers_together <- rbind(answers_ecology, answers_social)
 
-## Get a dataframe with all questions
-questions_codebook <- tmp_exl[[2]][,1:3]
-# Clean up
-questions_codebook <- questions_codebook %>% mutate(AnswerType=ifelse(Q_ID=="Q2", "yes/no/no research question", AnswerType),
-                                                    AnswerType=ifelse(Q_ID=="Q3", "Multiple choice", AnswerType))
+## Get a dataframe with codebook details (questions and answer options)
+codebook_template <- read_xlsx(path = ('./data/Codebook_template.xlsx'),  sheet = "Coding_tool", range = cell_limits(ul = c(7, 3), lr = c(97, 16)),
+                                col_names = c('Q_ID', 'Drop1', 'Drop2', 'Question', 'Drop3', 'AnswerType', 'Explan', 'Source', 'Drop4', 'Answer_CoderA', 'Comments_CoderA','Drop5', 'Answer_CoderB', 'Comments_CoderB'))
+
+codebook_template <- codebook_template %>% 
+  select(!starts_with('Drop')) %>%                                               ## drop the columns we do not need
+  filter(!row_number() %in% c(2, 5, 6, 13, 17, 30, 31, 45, 46, 56, 60, 86))      ## drop the rows we do not need
 
