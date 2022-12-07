@@ -92,3 +92,38 @@ openxlsx::saveWorkbook(wb, paste0(fold_path, Col_Q, ".xlsx"), overwrite = TRUE)
 print(paste("The table has been created and is saved at location:",
             normalizePath(paste0(fold_path, Col_Q, ".xlsx"))))
 }
+
+## 3. Function to count results per question and save them as data frame
+ # Format adjusted for use with flextable-package
+ # Q_ID needs to be a single char-variable
+
+count_question_result <- function(Q_ID, data, codebook_details) {
+  
+  Q = Q_ID
+  
+  # Count results to be stored in df_results
+  result_question = as.data.frame(data %>% group_by(category) %>% count(data[Q]))
+  
+  # Create data frame in right format to store count-results and afterwards use for flextable-layout
+  category_row <- rep(c("ecology", "social"), each = nrow(unique(result_question[Q]))) %>% append(NA, after=0)
+  answer_row <- rep(t(unique(result_question[Q])), times=2) %>% append(NA, after=0)
+  question <- filter(codebook_details, Q_ID == Q)[1,2] %>% pull(Question)
+  question_row <- rep(NA, times = length(answer_row)-1) %>% append(question, after=0)
+  df_result <- as.data.frame(rbind(category_row,answer_row,question_row))
+  
+  for(i in 2:ncol(df_result)) {       # for-loop over columns
+    var1 <- df_result[1,i]
+    var2 <- df_result[2,i]
+    #print(var1)
+    #print(var2)
+    result_count <- ifelse(identical(filter(result_question, category == var1 & result_question[Q] == var2)$n, integer(0)),
+                           0,
+                           filter(result_question, category == var1 & result_question[Q] == var2)$n)
+    #print(result_count)
+    df_result[3,i] <- result_count
+  }
+  #print(df_result)
+  
+  return(df_result)
+
+}

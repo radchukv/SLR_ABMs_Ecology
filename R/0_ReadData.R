@@ -34,5 +34,9 @@ answers_social$category <- rep(c("social"),times=nrow(answers_social))
 # combine ecology and social dataframe together
 answers_together <- rbind(answers_ecology, answers_social)
 
-# Get a dataframe with all questions
+## Get a dataframe with all questions
 questions_codebook <- tmp_exl[[2]][,1:3]
+# Clean up
+questions_codebook <- questions_codebook %>% mutate(AnswerType=ifelse(Q_ID=="Q2", "yes/no/no research question", AnswerType),
+                                                    AnswerType=ifelse(Q_ID=="Q3", "Multiple choice", AnswerType))
+
