@@ -10,7 +10,7 @@ source('./R/0_ReadData.R')
 ### Table for single questions with 2 answer options -------------------------------------------------------------------------------
 
 # settings for table
-questions <- list("Q0","Q7","Q8","Q9","Q12","Q13","Q19","Q20","Q28","Q30","Q31","Q38")
+questions <- list("Q0","Q7","Q8","Q9","Q12","Q13","Q28","Q30","Q31","Q38")
 #questions <- list("Q20")
 
 for (question in questions)  {
@@ -52,7 +52,7 @@ save_as_docx(ft, path = path_save)
 ### Table for question collection with 2 answer options -------------------------------------------------------------------------------
   
 # settings for table
-question_list <- list(list("Q14","Q15","Q16","Q17","Q18"), list("Q21","Q22","Q23")) 
+question_list <- list(list("Q14","Q15","Q16","Q17","Q18","Q19","Q20"), list("Q21","Q22","Q23")) 
 
 for (questions in question_list) {
   
