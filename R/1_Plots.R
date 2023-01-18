@@ -8,14 +8,14 @@ library(gridExtra)
 library(scales)
 source('./R/0_ReadData.R')
 
-'''
+
 ### Now exluded from folder from the beginning
 ## we exclude the 123 paper because it was not coded, the coders decided it does not belong to the sample actually
 
-sum(is.na(answers_together$Q0))
-is.na(answers_together$Q0)
-answers_together$PaperID[is.na(answers_together$Q0)]
-'''
+#sum(is.na(answers_together$Q0))
+#is.na(answers_together$Q0)
+#answers_together$PaperID[is.na(answers_together$Q0)]
+
 
 ## exclude NA sheets
 answers_together <- answers_together[!is.na(answers_together$Q0),]
