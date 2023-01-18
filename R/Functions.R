@@ -2,6 +2,16 @@
 
 ## 1. Function to read the Excel sheets
 
+#  1. Function checks whether (1) in folder with "aligned" files or (2) in folder with "comparison" files
+#  2. For (1), num_coder = 1 that for-loop runs only one iteration to read the aligned coding 
+#      --> output are two dataframes nested in a list: raw data and cleaned aligned coding 
+#      --> Used for analysis with plots and tables 
+#  3. For (2), num_coder = 2 that for-loop runs two iterations to read the coding of both coders 
+#      --> output are three dataframes nested in a list: raw data and cleaned coding for both coder 
+#      --> Used for IRR calculation
+
+
+
 read_exl <- function(filename) {
   if(grepl('Aligned', filename)){
     dat <- read_xlsx(path = filename,  sheet = "Coding_agreement", range = cell_limits(ul = c(7, 3), lr = c(97, 13)),
@@ -35,7 +45,7 @@ read_exl <- function(filename) {
     colnames(dat2_trs) <- dat2$Q_ID
     dat2_trs_cl <- dat2_trs %>% 
       filter(row_number() %in% 2) %>% 
-      mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][4],
+      mutate(PaperID = strsplit(strsplit(filename, split = '.xlsx')[[1]], split = '/')[[1]][5],
              coder = strsplit(coder, split = '_')[[1]][2])
     
     ##replacing manually added NA values from df to real NAs
@@ -81,4 +91,42 @@ openxlsx::addStyle(wb, sheet = 1, hs, rows = 1, cols= 1:ncol(table))
 openxlsx::saveWorkbook(wb, paste0(fold_path, Col_Q, ".xlsx"), overwrite = TRUE)
 print(paste("The table has been created and is saved at location:",
             normalizePath(paste0(fold_path, Col_Q, ".xlsx"))))
+}
+
+## 3. Function to count results per question and save them as data frame
+ # Format adjusted for use with flextable-package
+ # Q_ID needs to be a single char-variable
+
+count_question_result <- function(Q_ID, data, codebook_details) {
+  
+  
+  
+  Q = Q_ID
+  
+  # Count results to be stored in df_results
+  result_question = as.data.frame(data %>% group_by(category) %>% count(data[Q]))
+  
+  # Create data frame in right format to store count-results and afterwards use for flextable-layout
+  
+  answer_row <- rep(strsplit(filter(codebook_details, Q_ID == Q)[1,3] %>% pull(AnswerType), split = "/")[[1]], times=2) %>% append(NA, after=0)
+  category_row <- rep(c("ecology", "social"), each = length(unique(answer_row))-1) %>% append(NA, after=0)
+  question <- filter(codebook_details, Q_ID == Q)[1,2] %>% pull(Question)
+  question_row <- rep(NA, times = length(answer_row)-1) %>% append(question, after=0)
+  df_result <- as.data.frame(rbind(category_row,answer_row,question_row))
+  
+  for(i in 2:ncol(df_result)) {       # for-loop over columns
+    var1 <- df_result[1,i]
+    var2 <- df_result[2,i]
+    #print(var1)
+    #print(var2)
+    result_count <- ifelse(identical(filter(result_question, category == var1 & result_question[Q] == var2)$n, integer(0)),
+                           0,
+                           filter(result_question, category == var1 & result_question[Q] == var2)$n)
+    #print(result_count)
+    df_result[3,i] <- result_count
+  }
+  #print(df_result)
+  
+  return(df_result)
+
 }

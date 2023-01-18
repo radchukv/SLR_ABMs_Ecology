@@ -6,7 +6,7 @@ library(irr)
 source('./R/Functions.R')
 
 ## read in the data coded by the first coder
-files <- list.files(path = ('./data/Comparison_IRR'), full.names = TRUE)
+files <- list.files(path = ('./data/ecology/Comparison_IRR'), full.names = TRUE)
 
 #bind all data frames of FIRST data frame of read_exl() together
 answers_CoderA <- data.frame()
@@ -25,9 +25,9 @@ row.names(answers_CoderB) <- files
 answers_CoderA <- answers_CoderA[!is.na(answers_CoderA$Q0), ]
 answers_CoderB <- answers_CoderB[!is.na(answers_CoderB$Q0), ]
 
-'''
+
 ##### Start: testing calculations for kappa and raw agreement
-'''
+
 Q0 <- bind_cols(answers_CoderA$Q0, answers_CoderB$Q0)
 kappa2(Q0, weight = 'unweighted')
 
@@ -43,9 +43,9 @@ tmp_raw_agree
 tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(answers_CoderA)
 
 
-'''
+
 ##### End: testing calculations for kappa and raw agreement
-'''
+
 
 #### kappa for all questions in one df
 int_rel_per_quest <- data.frame()
