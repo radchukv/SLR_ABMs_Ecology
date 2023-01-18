@@ -26,7 +26,7 @@ answers_CoderA <- answers_CoderA[!is.na(answers_CoderA$Q0), ]
 answers_CoderB <- answers_CoderB[!is.na(answers_CoderB$Q0), ]
 
 
-##### Start: testing calculations for kappa and raw agreement
+### Start: testing calculations for kappa and raw (percentage) agreement---------------------------------
 
 Q0 <- bind_cols(answers_CoderA$Q0, answers_CoderB$Q0)
 kappa2(Q0, weight = 'unweighted')
@@ -38,16 +38,13 @@ kappa2(bind_cols(answers_CoderA$Q3, answers_CoderB$Q3))
 ## OR: one would really go for each sub-question (like Q3.1, Q3.2 etc)
 kappa2(bind_cols(answers_CoderA$Q3.1, answers_CoderB$Q3.1))
 
-tmp_raw_agree 
-## tmp_raw_agree <- as.data.frame(cbind(anwers_CoderA,ifelse(answers_CoderA$Q0==anwer_CoderB$Q0, 1, 0)))
+# Calculate raw (percentage) agreement 
 tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(answers_CoderA)
 
+### End: testing calculations for kappa and raw agreement------------------------------------------------
 
 
-##### End: testing calculations for kappa and raw agreement
-
-
-#### kappa for all questions in one df
+#### calculate kappa and raw (percentage) agreement for all questions in one dataframe
 int_rel_per_quest <- data.frame()
 
 for (i in 1:(length(answers_CoderB)-2)) {
@@ -71,7 +68,7 @@ for (i in 1:(length(answers_CoderB)-2)) {
 
 colnames(int_rel_per_quest)[1] <- "Question"
 colnames(int_rel_per_quest)[2] <- "kappa"
-colnames(int_rel_per_quest)[3] <- "raw agreement"
+colnames(int_rel_per_quest)[3] <- "raw (percentage) agreement"
 
 
 int_rel_per_quest$kappa[int_rel_per_quest$Question == 'Q10'] <- NA
@@ -96,6 +93,13 @@ abline(v = median(int_rel_per_quest$kappa, na.rm = T), col = 'blue', lwd = 2)
 dev.off()
 
 write.csv(int_rel_per_quest, file = './output/Cohenkappa_calc.csv')
+
+
+
+
+
+### Start: Work in progress--------------------------------------------------------------------------------------------------------------------
+
 quantile(int_rel_per_quest$kappa, probs = c(0.05, 0.1, 0.25, 0.7, 0.8), na.rm = T)
 #### kappa with levels from codebook, not actual data (work in progress)
 
@@ -121,3 +125,5 @@ for (i in 1:2) {
 
 (5*3+11*13)*(1/16^2)
 (16*16+0*0)*(1/16)
+
+### End: Work in progress-------------------------------------------------------------------------------------------------------------------
