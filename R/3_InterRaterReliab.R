@@ -81,22 +81,27 @@ for (i in 1:(length(answers_CoderB)-2)) {
   
   if((nrow(tmp_contigency_table)==1) && (ncol(tmp_contigency_table)==1)){
     tmp_gwet = 1 #If bother rater only used one answer the agreement always equals 1 (see e.g. Q20)
+    tmp_kappa2 = 1
   } else if(nrow(tmp_contigency_table) == ncol(tmp_contigency_table)){
       tmp_gwet <- gwet.ac1.table(tmp_contigency_table)$coeff.val #only if both rater used all answer option row and column number are the same, which is the needed format for calculating gwet
+      tmp_kappa2 <- kappa2.table(tmp_contigency_table)$coeff.val
     }else{
       tmp_gwet <- "NaN" #if contingency table has wrong format as one rater did not use all answer options (see e.g. Q15)
+      tmp_kappa2
     }
   
   #Raw (percentage) agreement
   tmp_raw_agree <- sum(ifelse(answers_CoderA[i]==answers_CoderB[i], 1, 0))/nrow(answers_CoderA)
   
-  int_rel_per_quest <- rbind(int_rel_per_quest, c(colnames(answers_CoderB)[i], tmp_kappa, tmp_gwet, tmp_raw_agree))
+  # bind all results together in one dataframe
+  int_rel_per_quest <- rbind(int_rel_per_quest, c(colnames(answers_CoderB)[i], tmp_kappa, tmp_gwet, tmp_raw_agree, tmp_kappa2))
 }
   
 colnames(int_rel_per_quest)[1] <- "Question"
 colnames(int_rel_per_quest)[2] <- "Kappa"
 colnames(int_rel_per_quest)[3] <- "AC1"
 colnames(int_rel_per_quest)[4] <- "Raw_percentage"
+colnames(int_rel_per_quest)[5] <- "Kappa2"
 
 
 int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q10'] <- NA
@@ -114,12 +119,14 @@ int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q42'] <- NA
 int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q43'] <- NA
 int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q44'] <- NA
 
+# Create a plot of the Kappa results
 int_rel_per_quest$Kappa <- as.numeric(int_rel_per_quest$Kappa)
 pdf('./plots/hist_CohensKappa.pdf')
 hist(int_rel_per_quest$Kappa, main ='', xlab = 'Kappa')
 abline(v = median(int_rel_per_quest$Kappa, na.rm = T), col = 'blue', lwd = 2)
 dev.off()
 
+# Print all results to csv file
 write.csv(int_rel_per_quest, file = './output/Cohenkappa_calc.csv')
 
 
