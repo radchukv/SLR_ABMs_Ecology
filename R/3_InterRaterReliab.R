@@ -43,8 +43,19 @@ kappa2(bind_cols(answers_CoderA$Q3.1, answers_CoderB$Q3.1))
 tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(answers_CoderA)
 
 # Calculate Gwet's AC1 and (Kappa) with the irrCAC-package including benchmarking
-tmp_contigency_table <- table(answers_CoderA$Q3.4, answers_CoderB$Q3.4) #create a contingency table
+tmp_contigency_table <-  as.data.frame.matrix(table(answers_CoderA$Q15, answers_CoderB$Q15)) #create a contingency table
+# Einträge von Tabelle sind vllt Index?? --> Fehler?
 print(tmp_contigency_table)
+
+un1 <- unique(sort(c(colnames(tmp_contigency_table), rownames(tmp_contigency_table))))
+m2 <- matrix(NA, length(un1), length(un1), dimnames = list(un1, un1))
+#m2[row.names(tmp_contigency_table), colnames(tmp_contigency_table)] <- tmp_contigency_table
+cols <- colnames(m2)[colnames(m2) %in% colnames(tmp_contigency_table)]
+rows <- rownames(m2)[rownames(m2) %in% rownames(tmp_contigency_table)]
+m2[rows, cols] <- tmp_contigency_table[rows, cols]
+m2
+print(m2)
+
 tmp_gwet <- gwet.ac1.table(tmp_contigency_table)
 tmp_gwet_bm <- landis.koch.bf(tmp_gwet$coeff.val,tmp_gwet$coeff.se) 
 tmp_kappa <- kappa2.table(tmp_contigency_table)
@@ -53,6 +64,9 @@ print(tmp_gwet)
 print(tmp_gwet_bm)
 print(tmp_kappa)
 print(tmp_kappa_bm)
+
+
+
 
 ### End: testing calculations for kappa and raw agreement------------------------------------------------
 
