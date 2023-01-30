@@ -44,7 +44,8 @@ tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(an
 
 # Calculate Gwet's AC1 and (Kappa) with the irrCAC-package including benchmarking
 tmp_contigency_table <-  as.data.frame.matrix(table(answers_CoderA$Q15, answers_CoderB$Q15)) #create a contingency table
-# Einträge von Tabelle sind vllt Index?? --> Fehler?
+# Einträge von Tabelle sind vllt Index?? --> Fehler? 
+# Sehe ich auch so!
 print(tmp_contigency_table)
 
 un1 <- unique(sort(c(colnames(tmp_contigency_table), rownames(tmp_contigency_table))))
