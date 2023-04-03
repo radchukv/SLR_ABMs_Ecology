@@ -22,29 +22,21 @@ row.names(answers_CoderA) <- files
 row.names(answers_CoderB) <- files
 
 
-## for now it seems like 123 study was not entered, so dropping it here (later on check with the coders)
+## Study [123] was excluded from sample set, so dropping it here by searching for NA entry of Q0
 answers_CoderA <- answers_CoderA[!is.na(answers_CoderA$Q0), ]
 answers_CoderB <- answers_CoderB[!is.na(answers_CoderB$Q0), ]
 
+## Replace NA with 0 for easier operations
+answers_CoderA[is.na(answers_CoderA)] <- 0
+answers_CoderB[is.na(answers_CoderB)] <- 0
 
 ### Start: testing calculations for Gwet's AC1, Cohen's kappa and raw (percentage) agreement---------------
 
-## Calculate kappa with irr-package
-Q0 <- bind_cols(answers_CoderA$Q0, answers_CoderB$Q0)
-kappa2(Q0, weight = 'unweighted')
-
-kappa2(bind_cols(answers_CoderA$Q1, answers_CoderB$Q1))
-kappa2(bind_cols(answers_CoderA$Q2, answers_CoderB$Q2))
-kappa2(bind_cols(answers_CoderA$Q3, answers_CoderB$Q3))
-## this metric is only possible to calculate for cases with mutually-exclusive categories
-## OR: one would really go for each sub-question (like Q3.1, Q3.2 etc)
-kappa2(bind_cols(answers_CoderA$Q3.1, answers_CoderB$Q3.1))
-
 ## Calculate raw (percentage) agreement 
-tmp_raw_agree <- sum(ifelse(answers_CoderA$Q1==answers_CoderB$Q1, 1, 0))/nrow(answers_CoderA)
+tmp_raw_agree <- sum(ifelse(answers_CoderA$Q18==answers_CoderB$Q18, 1, 0))/nrow(answers_CoderA)
 
 ## Calculate Gwet's AC1 and Kappa with the irrCAC-package including benchmarking
-tmp_contigency_table <-  as.matrix(table(answers_CoderA$Q7, answers_CoderB$Q7)) #create a contingency table
+tmp_contigency_table <-  as.matrix(table(answers_CoderA$Q19, answers_CoderB$Q19)) #create a contingency table
 
 #create support matrix since not always nxn matrix (on coder did not use on of the answer options)
 un1 <- unique(sort(c(colnames(tmp_contigency_table), rownames(tmp_contigency_table))))
@@ -60,11 +52,6 @@ tmp_gwet <- gwet.ac1.table(tmp_contigency_table)
 #tmp_gwet_bm <- landis.koch.bf(tmp_gwet$coeff.val,tmp_gwet$coeff.se) 
 tmp_kappa <- kappa2.table(tmp_contigency_table)
 #tmp_kappa_bm <- landis.koch.bf(tmp_kappa$coeff.val,tmp_kappa$coeff.se) 
-#print(tmp_gwet)
-#print(tmp_gwet_bm)
-#print(tmp_kappa)
-#print(tmp_kappa_bm)
-
 
 
 
@@ -78,19 +65,8 @@ for (i in 1:(length(answers_CoderB)-2)) {
   if(str_detect(colnames(answers_CoderB)[i+1], "\\.1")){
     next
   }
-  #Cohen's Kappa
-  tmp_kappa <- kappa2(bind_cols(answers_CoderA[i], answers_CoderB[i]))$value
-  if(tmp_kappa == "NaN") { #problem with calculation, if only one variable expression exists
-    if((nrow(unique(answers_CoderB[i])) == 1 && nrow(unique(answers_CoderA[i])) == 1) ||
-       (nrow(unique(answers_CoderB[i])) == 2 && sum(is.na(unique(answers_CoderA[i]))) == 1) ||
-       (nrow(unique(answers_CoderA[i])) == 2 && sum(is.na(unique(answers_CoderB[i]))) == 1)) {
-      
-      tmp_kappa = 1
-
-    }
-  }
-
-  #Gwet's AC1
+ 
+  #Gwet's AC1 and Kappa
   tmp_contigency_table <- as.data.frame.matrix(table(answers_CoderA[i][,1], answers_CoderB[i][,1])) #create a contingency table
   
   if((nrow(tmp_contigency_table)==1) && (ncol(tmp_contigency_table)==1)){
@@ -100,38 +76,34 @@ for (i in 1:(length(answers_CoderB)-2)) {
       tmp_gwet <- gwet.ac1.table(tmp_contigency_table)$coeff.val #only if both rater used all answer option row and column number are the same, which is the needed format for calculating gwet
       tmp_kappa2 <- kappa2.table(tmp_contigency_table)$coeff.val
     }else{
-      tmp_gwet <- "NaN" #if contingency table has wrong format as one rater did not use all answer options (see e.g. Q15)
-      tmp_kappa2
+      # create a new contingency table in the correct nxn format
+      tmp_contigency_table <-  as.matrix(table(answers_CoderA[i][,1], answers_CoderB[i][,1])) #create a contingency table
+      # create support matrix since not always nxn matrix (on coder did not use on of the answer options)
+      un1 <- unique(sort(c(colnames(tmp_contigency_table), rownames(tmp_contigency_table))))
+      m2 <- matrix(NA, length(un1), length(un1), dimnames = list(un1, un1))
+      cols <- colnames(m2)[colnames(m2) %in% colnames(tmp_contigency_table)]
+      rows <- rownames(m2)[rownames(m2) %in% rownames(tmp_contigency_table)]
+      m2[rows, cols] <- tmp_contigency_table[rows, cols]
+      m2[is.na(m2)] <- 0
+      # over-write the tmp_contingency_table with the new and correct table
+      tmp_contigency_table <- m2
+      
+      # calculate AC1 and Kappa
+      tmp_gwet <- gwet.ac1.table(tmp_contigency_table)$coeff.val
+      tmp_kappa2 <- kappa2.table(tmp_contigency_table)$coeff.val
     }
   
   #Raw (percentage) agreement
   tmp_raw_agree <- sum(ifelse(answers_CoderA[i]==answers_CoderB[i], 1, 0))/nrow(answers_CoderA)
   
   # bind all results together in one dataframe
-  int_rel_per_quest <- rbind(int_rel_per_quest, c(colnames(answers_CoderB)[i], tmp_kappa, tmp_gwet, tmp_raw_agree, tmp_kappa2))
+  int_rel_per_quest <- rbind(int_rel_per_quest, c(colnames(answers_CoderB)[i], tmp_kappa2, tmp_gwet, tmp_raw_agree))
 }
   
 colnames(int_rel_per_quest)[1] <- "Question"
 colnames(int_rel_per_quest)[2] <- "Kappa"
 colnames(int_rel_per_quest)[3] <- "AC1"
 colnames(int_rel_per_quest)[4] <- "Raw_percentage"
-colnames(int_rel_per_quest)[5] <- "Kappa2"
-
-
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q10'] <- NA
-#int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q11.5'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q24'] <- NA
-#int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q25'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q32'] <- NA
-#int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q34.4'] <- NA
-#int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q36.6'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q37'] <- NA
-#int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q39'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q40'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q41'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q42'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q43'] <- NA
-int_rel_per_quest$Kappa[int_rel_per_quest$Question == 'Q44'] <- NA
 
 # Create a plot of the Kappa results
 int_rel_per_quest$Kappa <- as.numeric(int_rel_per_quest$Kappa)
