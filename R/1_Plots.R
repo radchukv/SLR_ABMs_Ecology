@@ -412,7 +412,11 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_Q4,
 
 ggsave("./plots/alluvial_small.pdf")
 
-# Sebastian version
+# Currently used version
+
+# to create the alluvial plots for ecology or social science only filter answers_together
+# for discipline in column "category" (not yet implemented as separate code)
+
 answers_together$practise_phase_2 <- NA
 # add good practise for phase 2: sampling phase
 for (j in 1:length(answers_together$Q0)) {
