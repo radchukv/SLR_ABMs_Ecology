@@ -6,6 +6,7 @@ library(ggplot2)
 library(ggalluvial)
 library(gridExtra)
 library(scales)
+library(patchwork)
 source('./R/0_ReadData.R')
 
 
@@ -282,6 +283,37 @@ ggsave("./plots/Q30.pdf")
 answers_together$Q32 <- as.numeric(answers_together$Q32)
 summary(answers_together$Q32)
 
+#Q32 update according to fig. 4.4 paper
+answers_ecology$Q32 <- as.numeric(answers_ecology$Q32)
+answers_social$Q32 <- as.numeric(answers_social$Q32)
+
+p1 <- ggplot(data = answers_ecology[!is.na(answers_ecology$Q32),], 
+       aes(reorder(PaperID, -Q32), Q32)) +
+  geom_bar(stat="identity") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  ylab("Sample size in review article") +
+  xlab("Article ID") +
+  ggtitle("ecology")
+
+
+p2 <- ggplot(data = answers_social[!is.na(answers_social$Q32),], 
+       aes(reorder(PaperID, -Q32), Q32)) +
+  geom_bar(stat="identity") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y=element_blank()) +
+  ylab("Sample size in review article") +
+  xlab("Article ID") +
+  ggtitle("social")
+
+
+p1 + p2
+
+ggsave("./plots/Q32_fig4.4.pdf")
+
 
 ## Analysis phase
 #Q36
@@ -445,6 +477,61 @@ ggplot(data = answers_together, aes(axis1 = practise_Q1, axis2 = practise_phase_
 
 ggsave("./plots/alluvial_finSeb.pdf")
 
+# updated version for separated alluvial plots
+
+# needs to reorder the data
+#alluvial_data <- data.frame(answers_together$practise_Q1, answers_together$practise_phase_2, answers_together$practise_Q36, answers_together$category)
+#names(alluvial_data) <- c("Quest_form", "Samp_phase", "Ana_phase", "category")
+all <- rep("", 42)
+for (i in 1:length(answers_together$practise_Q1)) {
+  ifelse(answers_together$practise_Q1[i] == "Yes" && answers_together$practise_phase_2[i] == "Yes" && answers_together$practise_Q36[i] == "Yes", all[i] <- "Yes", all[i] <- "No") 
+}
+
+answers <- c(answers_together$practise_Q1, answers_together$practise_phase_2, answers_together$practise_Q36, all)
+studies <- rep(1:42, 4)
+category <- rep(answers_together$category, 4)
+phase <- c(rep("Quest_form", 42), rep("Samp_phase", 42),rep("Ana_phase", 42), rep("all", 42))
+alluvial_data <- data.frame(studies, phase, answers)
+alluvial_data$phase <- factor(alluvial_data$phase, levels = c("Quest_form", "Samp_phase", "Ana_phase", "all"))
+alluvial_data$category <- category
+
+p1 <- ggplot(alluvial_data[alluvial_data$category == "ecology",], 
+       aes(x = phase, stratum = answers, alluvium = studies,
+           fill = answers, label = answers)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") +
+  geom_flow(stat = "alluvium", lode.guidance = "frontback",
+            color = "darkgray") +
+  geom_stratum(fill = "white", color = "grey") +
+  scale_x_discrete(labels = c("Question\nformulation", "Sampling phase", "Analysis\nphase", "all"), expand = c(.05, .05)) +
+  geom_text(stat = "stratum", size = 5) +
+  guides(fill="none") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
+  ylab("count") +
+  #guides(fill=guide_legend(title="Does the paper comply with the 'good practice?'")) +
+  ggtitle("a)")
+
+p2 <- ggplot(alluvial_data[alluvial_data$category == "social",], 
+       aes(x = phase, stratum = answers, alluvium = studies,
+           fill = answers, label = answers)) +
+  scale_fill_brewer(type = "qual", palette = "Set1") +
+  geom_flow(stat = "alluvium", lode.guidance = "frontback",
+            color = "darkgray") +
+  geom_stratum(fill = "white", color = "grey") +
+  scale_x_discrete(labels = c("Question\nformulation", "Sampling phase", "Analysis\nphase", "all"), expand = c(.05, .05)) +
+  geom_text(stat = "stratum", size = 5) +
+  theme(legend.position = "bottom") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
+        legend.position = 'bottom') +
+  ylab("count") +
+  guides(fill=guide_legend(title="Does the paper comply with the 'good practice?'")) +
+  ggtitle("b)")
+
+p1 / p2
+
+ggsave("./plots/alluvial_separated_update.pdf")
+
 ##RQ3.1
 #Q2
 #barplot
@@ -499,6 +586,53 @@ ggplot(data = data.frame(Q33_sum),aes(seq_along(Q33_sum),Q33_sum)) +
         axis.text.x = element_text(angle = 45, hjust=1))
 
 ggsave("./plots/Q33.pdf")
+
+#Q33 from paper fig.5.3
+Q33_df <- data.frame(
+  c(rep("Q33.1", 42), rep("Q33.2", 42), rep("Q33.3", 42), rep("Q33.4", 42),
+    rep("Q33.5", 42), rep("Q33.6", 42), rep("Q33.7", 42), rep("Q33.8", 42)),
+  c(answers_together$Q33.1, answers_together$Q33.2, answers_together$Q33.3, 
+    answers_together$Q33.4, answers_together$Q33.5, answers_together$Q33.6,
+    answers_together$Q33.7, answers_together$Q33.8),
+  rep(answers_together$PaperID, 8),
+  rep(answers_together$category, 8)
+)
+names(Q33_df) <- c("subquestion", "answer", "Paper_ID", "category")
+Q33_df$answer_num <- 0
+for (i in 1:length(Q33_df$answer)) {
+  if (Q33_df$answer[i] == "Yes") {
+    Q33_df$answer_num[i] <- 1
+  }
+}
+
+
+p1 <- ggplot() +
+  geom_bar(data = Q33_df[Q33_df$category == "ecology",], 
+           aes(fill = subquestion, y=answer_num, x=reorder(Paper_ID, -answer_num)), 
+           position="stack", stat="identity", width=0.8) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        legend.position = 'none', axis.title.x = element_blank()) +
+  ylab("count") +
+  ylim(0, 6) +
+  ggtitle("ecology")
+
+p2 <- ggplot() +
+  geom_bar(data = Q33_df[Q33_df$category == "social",], 
+           aes(fill = subquestion, y=answer_num, x=reorder(Paper_ID, -answer_num)), 
+           position="stack", stat="identity", width=0.4) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        axis.title.y=element_blank(), axis.text.y=element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.title.x = element_blank()) +
+  ylab("count") +
+  ggtitle("social")
+
+
+p1 + p2
+
+ggsave("./plots/Q33_fig5.3.pdf")
 
 #Q34
 Q34_sum <- c()
