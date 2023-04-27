@@ -502,12 +502,16 @@ p1 <- ggplot(alluvial_data[alluvial_data$category == "ecology",],
   geom_flow(stat = "alluvium", lode.guidance = "frontback",
             color = "darkgray") +
   geom_stratum(fill = "white", color = "grey") +
-  scale_x_discrete(labels = c("Question\nformulation", "Sampling phase", "Analysis\nphase", "all"), expand = c(.05, .05)) +
-  geom_text(stat = "stratum", size = 5) +
+  scale_x_discrete(labels = c("Question\nformulation", "Sampling\nphase", "Analysis\nphase", "Overall"), expand = c(.05, .05)) +
+  geom_text(stat = "stratum", size = 3) +
   guides(fill="none") +
   theme_bw() +
-  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank()) +
-  ylab("count") +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), 
+        axis.title = element_text(size = 8), plot.title = element_text(size = 8),
+        legend.title = element_text(size=8),axis.text.x = element_text(size =8, color = "black"),
+        axis.text.y = element_text(size =8, color = "black")) +
+  ylab("Article Sample") +
+  xlab("SLR steps") +
   #guides(fill=guide_legend(title="Does the paper comply with the 'good practice?'")) +
   ggtitle("a)")
 
@@ -518,19 +522,22 @@ p2 <- ggplot(alluvial_data[alluvial_data$category == "social",],
   geom_flow(stat = "alluvium", lode.guidance = "frontback",
             color = "darkgray") +
   geom_stratum(fill = "white", color = "grey") +
-  scale_x_discrete(labels = c("Question\nformulation", "Sampling phase", "Analysis\nphase", "all"), expand = c(.05, .05)) +
-  geom_text(stat = "stratum", size = 5) +
+  scale_x_discrete(labels = c("Question\nformulation", "Sampling\nphase", "Analysis\nphase", "Overall"), expand = c(.05, .05)) +
+  geom_text(stat = "stratum", size = 3) +
   theme(legend.position = "bottom") +
   theme_bw() +
-  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(),
-        legend.position = 'bottom') +
-  ylab("count") +
-  guides(fill=guide_legend(title="Does the paper comply with the 'good practice?'")) +
+  theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank(), 
+        axis.title = element_text(size = 8), legend.position = 'bottom',plot.title = element_text(size = 8),
+        axis.text.x = element_text(size =8, color = "black"), axis.text.y = element_text(size =8, color = "black"),
+        legend.title = element_text(size=8)) +
+  ylab("Article Sample") +
+  xlab("SLR steps") +
+  guides(fill=guide_legend(title="Does the paper comply with 'good practice?' ")) +
   ggtitle("b)")
 
 p1 / p2
 
-ggsave("./plots/alluvial_separated_update.pdf")
+ggsave("./plots/alluvial_separated_update.png", dpi=300)
 
 ##RQ3.1
 #Q2
