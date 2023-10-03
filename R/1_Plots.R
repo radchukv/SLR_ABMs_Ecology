@@ -550,6 +550,52 @@ p1 / p2
 
 ggsave("./plots/alluvial_separated_update.png", dpi=300)
 
+# VennDiagram alternative
+
+devtools::install_github("gaospecial/ggVennDiagram")
+library("ggVennDiagram")
+
+
+# bring data in right dataframe format
+ven_ecology_data <- answers_together[answers_together$category =="ecology", 
+                                     c("PaperID", "practise_Q1", "practise_phase_2", "practise_Q36")]
+ven_ecology_data$practise_Q1 <- ifelse(ven_ecology_data$practise_Q1 == "Yes", 1, 0)
+ven_ecology_data$practise_phase_2 <- ifelse(ven_ecology_data$practise_phase_2 == "Yes", 1, 0)
+ven_ecology_data$practise_Q36 <- ifelse(ven_ecology_data$practise_Q36 == "Yes", 1, 0)
+
+ven_social_data <- answers_together[answers_together$category =="social", 
+                                     c("PaperID", "practise_Q1", "practise_phase_2", "practise_Q36")]
+ven_social_data$practise_Q1 <- ifelse(ven_social_data$practise_Q1 == "Yes", 1, 0)
+ven_social_data$practise_phase_2 <- ifelse(ven_social_data$practise_phase_2 == "Yes", 1, 0)
+ven_social_data$practise_Q36 <- ifelse(ven_social_data$practise_Q36 == "Yes", 1, 0)
+
+# change to list
+ven_ecology_list <- list(
+  Question = unlist(as.list(ven_ecology_data[ven_ecology_data$practise_Q1 == 1,"PaperID"])), 
+  Sampling = unlist(as.list(ven_ecology_data[ven_ecology_data$practise_phase_2 == 1,"PaperID"])), 
+  Analysis = unlist(as.list(ven_ecology_data[ven_ecology_data$practise_Q36 == 1,"PaperID"])))
+
+ven_social_list <- list(
+  Question = unlist(as.list(ven_social_data[ven_social_data$practise_Q1 == 1,"PaperID"])), 
+  Sampling = unlist(as.list(ven_social_data[ven_social_data$practise_phase_2 == 1,"PaperID"])), 
+  Analysis = unlist(as.list(ven_social_data[ven_social_data$practise_Q36 == 1,"PaperID"])))
+
+# plot venn diagram for ecology
+ggVennDiagram(ven_ecology_list, label_alpha = 0.6, edge_lty = 0, set_size = 3) +
+  ggplot2::scale_fill_gradient(low="white",high = "aquamarine3")+
+  ggplot2::ggtitle("Does the review follows 'good practice'?", 
+                   subtitle = "Ecology papers: n=29") +
+  ggplot2::theme(legend.position='top', 
+                 legend.justification='right',
+                 legend.direction='horizontal')
+
+# plot venn diagram for ecology
+ggVennDiagram(ven_social_list, label_alpha = 0.6, edge_lty = 0, set_size = 3) +
+  ggplot2::scale_fill_gradient(low="white",high = "aquamarine3") +
+  ggplot2::ggtitle("Does the review follows 'good practice'?", 
+                   subtitle = "Social Science papers: n=13") +
+  ggplot2::theme(legend.position='none')
+
 
 #Q33 new Figure 5.3
 
