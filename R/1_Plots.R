@@ -1,6 +1,7 @@
 ## 1. reading in the files
 
 library(readxl)
+library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(ggalluvial)
@@ -24,10 +25,16 @@ source('./R/0_ReadData.R')
 ## exclude NA sheets
 answers_together <- answers_together[!is.na(answers_together$Q0),]
 
-## 2. plots
+
+### Pre-analysis------------------------------------------------------------------------------------------------
+
+
+## Settings
 
 color_chosen <- "green"
 edge_rec <- 0.5
+
+##RQ phase
 
 #Q0
 #barplot
@@ -64,8 +71,26 @@ ggplot(data = answers_together, aes(x = Q1)) +
 
 ggsave("./plots/Q1.pdf")
 
-##RQ1.2
+
+#Q2
+#barplot
+ggplot(data = answers_together, aes(x = Q2)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggsave("./plots/Q2.pdf")
+
+#simple table with proportions
+Q2_table <- table(answers_together$Q2)
+Q2_table <- cbind(Q2_table,prop.table(Q2_table))
+
+
 ##sampling phase
+
 #Q3
 #max(c(sum(answers_together$Q3 == "Q3.1"), sum(answers_together$Q3 == "Q3.2"),sum(answers_together$Q3 == "Q3.3"), sum(answers_together$Q3 == "Q3.4")))
 x_max = length(unique(answers_together$Q3))-0.5
@@ -312,13 +337,10 @@ p2 <- ggplot(data = answers_social[!is.na(answers_social$Q32),],
   xlab("Article ID") +
   ggtitle("social")
 
-
 p1 + p2
-
 ggsave("./plots/Q32_fig4.4.pdf")
 
 
-## Analysis phase
 #Q36
 Q36_sum <- c()
 #names_Q11 <- c("Q11.1", "Q11.2", "Q11.3", "Q11.4", "Q11.5")
@@ -353,7 +375,71 @@ ggplot(data = data.frame(Q36_sum),aes(seq_along(Q36_sum),Q36_sum)) +
 
 ggsave("./plots/Q36.pdf")
 
-# Alluvial plot for the overlap between the phases
+
+#Q33.7
+ggplot(data = answers_together, aes(x = Q33.7)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
+  scale_y_continuous(breaks= pretty_breaks()) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+ggsave("./plots/Q33.7.pdf")
+
+#Q34 (bar chart)
+Q34_sum <- c()
+names_Q34 <- c("Design perspective", "Insight perspective", "Effect perspective", "Other")
+
+for (i in 60:62) {
+  Q34_sum <- append(Q34_sum, sum((answers_together[i] == "Yes"), na.rm = T))
+}
+Q34_sum <- append(Q34_sum, sum((answers_together$Q34.4 != "No"), na.rm = T))
+names(Q34_sum) <- names_Q34
+
+ggplot(data = data.frame(Q34_sum),aes(seq_along(Q34_sum),Q34_sum)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Q34_sum), vjust=-0.5) +
+  scale_x_continuous(name = "Q34", breaks = c(1,2,3,4), labels = names_Q34) +
+  scale_y_continuous(breaks= pretty_breaks()) +
+  ylab("count") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1))
+
+ggsave("./plots/Q34.pdf")
+
+
+#Q33
+Q33_sum <- c()
+names_Q33 <- c("Description of or new\ninsights about mechanisms", "Behavioral model comparisons",
+               "Generalization derived\nfrom the review", "Identify gaps and\nresearch avenues", 
+               "Discussion of alternative\nformalizations", "Discussion of theories",
+               "Theory development is\nan explicit focus", "Others")
+
+for (i in 51:57) {
+  Q33_sum <- append(Q33_sum, sum((answers_together[i] == "Yes"), na.rm = T))
+}
+Q33_sum <- append(Q33_sum, sum((answers_together$Q33.8 != "No"), na.rm = T))
+names(Q33_sum) <- names_Q33
+
+ggplot(data = data.frame(Q33_sum),aes(seq_along(Q33_sum),Q33_sum)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = Q33_sum), vjust=-0.5) +
+  scale_x_continuous(name = "Q33", breaks = c(1,2,3,4,5,6,7,8), labels = names_Q33) +
+  scale_y_continuous(breaks= pretty_breaks()) +
+  ylab("count") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust=1))
+
+ggsave("./plots/Q33.pdf")
+
+### Analysis plotting found in article -----------------------------------------------------------------------
+
+# Define criteria for good practice based on selected questions
 #Q1
 answers_together$practise_Q1 <- NA
 answers_together$practise_Q1[which(answers_together$Q1 != "No")] <- "Yes"
@@ -391,11 +477,22 @@ answers_together$practise_Q36 <- NA
 answers_together$practise_Q36[which(answers_together$Q36.5 != "Yes")] <- "Yes"
 answers_together$practise_Q36[which(answers_together$Q36.5 == "Yes")] <- "No"
 
-# updated version for separated alluvial plots
 
-# needs to reorder the data
-#alluvial_data <- data.frame(answers_together$practise_Q1, answers_together$practise_phase_2, answers_together$practise_Q36, answers_together$category)
-#names(alluvial_data) <- c("Quest_form", "Samp_phase", "Ana_phase", "category")
+
+# Updated version for separated alluvial plots
+
+# add good practice for phase 2: sampling phase
+answers_together$practise_phase_2 <- NA
+for (j in 1:length(answers_together$Q0)) {
+  for (i in 83:89) {
+    if(answers_together[j,i] == "No") {
+      answers_together$practise_phase_2[j] = "No"
+      break
+    }
+  }
+}
+answers_together$practise_phase_2[is.na(answers_together$practise_phase_2)] <- "Yes"
+
 all <- rep("", 42)
 for (i in 1:length(answers_together$practise_Q1)) {
   ifelse(answers_together$practise_Q1[i] == "Yes" && answers_together$practise_phase_2[i] == "Yes" && answers_together$practise_Q36[i] == "Yes", all[i] <- "Yes", all[i] <- "No") 
@@ -453,33 +550,6 @@ p1 / p2
 
 ggsave("./plots/alluvial_separated_update.png", dpi=300)
 
-##RQ3.1
-#Q2
-#barplot
-ggplot(data = answers_together, aes(x = Q2)) +
-  geom_bar() +
-  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
-  scale_y_continuous(breaks= pretty_breaks()) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-ggsave("./plots/Q2.pdf")
-
-#simple table with proportions
-Q2_table <- table(answers_together$Q2)
-Q2_table <- cbind(Q2_table,prop.table(Q2_table))
-
-#Q33.7
-ggplot(data = answers_together, aes(x = Q33.7)) +
-  geom_bar() +
-  geom_text(stat='count', aes(label=..count..), vjust=-0.5) +
-  scale_y_continuous(breaks= pretty_breaks()) +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-
-ggsave("./plots/Q33.7.pdf")
 
 #Q33 new Figure 5.3
 
@@ -521,59 +591,10 @@ ggdraw() +
 
 ggsave("./plots/fig53.svg", width = 1000, height=600, limitsize = FALSE)
 
-##################################
-
-#Q34 (bar chart)
-Q34_sum <- c()
-names_Q34 <- c("Design perspective", "Insight perspective", "Effect perspective", "Other")
-
-for (i in 60:62) {
-  Q34_sum <- append(Q34_sum, sum((answers_together[i] == "Yes"), na.rm = T))
-}
-Q34_sum <- append(Q34_sum, sum((answers_together$Q34.4 != "No"), na.rm = T))
-names(Q34_sum) <- names_Q34
-
-ggplot(data = data.frame(Q34_sum),aes(seq_along(Q34_sum),Q34_sum)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = Q34_sum), vjust=-0.5) +
-  scale_x_continuous(name = "Q34", breaks = c(1,2,3,4), labels = names_Q34) +
-  scale_y_continuous(breaks= pretty_breaks()) +
-  ylab("count") +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust=1))
-
-ggsave("./plots/Q34.pdf")
 
 
-#Q33
-Q33_sum <- c()
-names_Q33 <- c("Description of or new\ninsights about mechanisms", "Behavioral model comparisons",
-               "Generalization derived\nfrom the review", "Identify gaps and\nresearch avenues", 
-               "Discussion of alternative\nformalizations", "Discussion of theories",
-               "Theory development is\nan explicit focus", "Others")
 
-for (i in 51:57) {
-  Q33_sum <- append(Q33_sum, sum((answers_together[i] == "Yes"), na.rm = T))
-}
-Q33_sum <- append(Q33_sum, sum((answers_together$Q33.8 != "No"), na.rm = T))
-names(Q33_sum) <- names_Q33
-
-ggplot(data = data.frame(Q33_sum),aes(seq_along(Q33_sum),Q33_sum)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = Q33_sum), vjust=-0.5) +
-  scale_x_continuous(name = "Q33", breaks = c(1,2,3,4,5,6,7,8), labels = names_Q33) +
-  scale_y_continuous(breaks= pretty_breaks()) +
-  ylab("count") +
-  theme_bw() +
-  theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust=1))
-
-ggsave("./plots/Q33.pdf")
-
-############################################################################################
+### Old code ---------------------------------------------------------------------------------------------------
 
 #Q33 old version of Figure 5.3
 Q33_df <- data.frame(
