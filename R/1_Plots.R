@@ -550,7 +550,10 @@ p1 / p2
 
 ggsave("./plots/alluvial_separated_update.png", dpi=300)
 
-# VennDiagram alternative
+
+
+
+## VennDiagram alternative
 
 devtools::install_github("gaospecial/ggVennDiagram")
 library("ggVennDiagram")
@@ -581,32 +584,34 @@ ven_social_list <- list(
   Analysis = unlist(as.list(ven_social_data[ven_social_data$practise_Q36 == 1,"PaperID"])))
 
 # plot venn diagram for ecology
-ggVennDiagram(ven_ecology_list, label_alpha = 0.6, edge_lty = 0, set_size = 3) +
-  ggplot2::scale_fill_gradient(low="white",high = "aquamarine3")+
-  ggplot2::ggtitle("Does the review follows 'good practice'?", 
-                   subtitle = "Ecology papers: n=29") +
-  ggplot2::theme(legend.position='top', 
-                 legend.justification='right',
-                 legend.direction='horizontal')
-
-# plot venn diagram for ecology
-ggVennDiagram(ven_social_list, label_alpha = 0.6, edge_lty = 0, set_size = 3) +
+ggVennDiagram(ven_ecology_list, label_alpha = 0.6, edge_lty = 0, set_size = 3, 
+              category.names = c("Question formulation","Sampling step","Analysis step")) +
   ggplot2::scale_fill_gradient(low="white",high = "aquamarine3") +
   ggplot2::ggtitle("Does the review follows 'good practice'?", 
-                   subtitle = "Social Science papers: n=13") +
+                   subtitle = "Ecology papers: n=29") +
   ggplot2::theme(legend.position='none')
+
+
+# plot venn diagram for social
+ggVennDiagram(ven_social_list, label_alpha = 0.6, edge_lty = 0, set_size = 4, 
+                    category.names = c("Question formulation","Sampling step","Analysis step")) +
+  ggplot2::scale_x_continuous(expand = expansion(mult = .3)) +
+  ggplot2::scale_fill_gradient(low="white",high = "grey") +
+  ggplot2::ggtitle("Does the review follows 'good practice'?", subtitle = "Social Science papers: n=13") +
+  ggplot2::theme(legend.position='bottom', 
+                 legend.direction='horizontal')
 
 
 #Q33 new Figure 5.3
 
 #theory <- read_excel("fig53.xlsx")
-Q33_df <- select(answers_together, PaperID, category, Q33.1, Q33.2, Q33.3, Q33.4, Q33.5, Q33.6, Q33.7)
-Q33_df <- Q33_df %>% rename("Dim-1" = "Q33.1",
-                            "Dim-2" = "Q33.2",
-                            "Dim-3" = "Q33.3",
-                            "Dim-4" = "Q33.4",
-                            "Dim-5" = "Q33.5",
-                            "Dim-6" = "Q33.6",
+Q33_df <- select(answers_together, PaperID, category, Q33.2, Q33.1, Q33.6, Q33.5, Q33.3, Q33.4, Q33.7)
+Q33_df <- Q33_df %>% rename("Dim-1" = "Q33.2",
+                            "Dim-2" = "Q33.1",
+                            "Dim-3" = "Q33.6",
+                            "Dim-4" = "Q33.5",
+                            "Dim-5" = "Q33.3",
+                            "Dim-6" = "Q33.4",
                             "Dim-7" = "Q33.7")
 
 Q33_df_long <- gather(Q33_df, Dimension, Discussed, `Dim-1`:`Dim-7`, factor_key=TRUE)
